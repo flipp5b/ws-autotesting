@@ -8,7 +8,6 @@
     <name>ws-autotesting</name>
 
     <properties>
-        <!-- Skip integration tests by default. Use profile 'it' to execute integration tests -->
         <skipITs>true</skipITs>
     </properties>
 
@@ -21,6 +20,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Добавляем BOM с указанием версий артефактов для Arquillian -->
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
                 <artifactId>arquillian-bom</artifactId>
@@ -47,12 +47,17 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Зависимость для интеграции Arquillian с JUnit.
+             При необходимости мы могли бы аналогично указать интеграцию с TestNG -->
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Arquillian-адаптер для сервера приложений WildFly-9.0.1.Final.
+             Адаптеры есть для большинства популярных серверов, поэтому, в зависимости от потребности,
+             можно указать адаптер для другого сервера -->
         <dependency>
             <groupId>org.wildfly.arquillian</groupId>
             <artifactId>wildfly-arquillian-container-managed</artifactId>
@@ -60,6 +65,7 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Зависимость от SoapUI для запуска тестов из SoapUI-проекта -->
         <dependency>
             <groupId>com.smartbear.soapui</groupId>
             <artifactId>soapui</artifactId>
@@ -75,10 +81,14 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <!-- Fork every test because it will launch a separate AS instance -->
+                    <!-- Выполнять тесты последовательно, форкая для каждого новую VM -->
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
+
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
+
+                    <!-- Будем пропускать выполнение тестов, если явно не указан профиль it
+                         (т.к. интеграционные тесты могут выполняться очень долго)-->
                     <skipITs>${skipITs}</skipITs>
                 </configuration>
                 <executions>
@@ -105,7 +115,6 @@
 
     <profiles>
         <profile>
-            <!-- Integration testing profile -->
             <id>it</id>
             <properties>
                 <skipITs>false</skipITs>
